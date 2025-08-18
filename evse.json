@@ -1,0 +1,137 @@
+{
+  "version": "v3.9.1",
+  "serialnr": 7777,
+  "mode": "SOLAR",
+  "mode_id": 2,
+  "car_connected": true,
+  "wifi": {
+    "status": "WL_CONNECTED",
+    "ssid": "Juurlink",
+    "rssi": -56,
+    "bssid": "18:E8:29:C7:C2:62"
+  },
+  "evse": {
+    "temp": 28,
+    "temp_max": 65,
+    "connected": true,
+    "access": 1,
+    "mode": 2,
+    "loadbl": 1,
+    "pwm": 1024,
+    "custombutton": false,
+    "solar_stop_timer": 0,
+    "state": "Charging Stopped - No Power Available",
+    "state_id": 9,
+    "error": "None",
+    "error_id": 0,
+    "rfidreader": "Disabled",
+    "nrofphases": 3,
+    "rfid": "Not Installed"
+  },
+  "settings": {
+    "charge_current": 0,
+    "override_current": 0,
+    "current_min": 6,
+    "current_max": 16,
+    "current_main": 25,
+    "current_max_circuit": 25,
+    "current_max_sum_mains": 0,
+    "max_sum_mains_time": 0,
+    "solar_max_import": 0,
+    "solar_start_current": 6,
+    "solar_stop_time": 1,
+    "enable_C2": "Solar Off",
+    "mains_meter": "HmWzrd P1",
+    "starttime": 0,
+    "stoptime": 0,
+    "repeat": 0,
+    "lcdlock": 0,
+    "lock": 0,
+    "cablelock": 0
+  },
+  "mqtt": {
+    "host": "",
+    "port": 1883,
+    "topic_prefix": "SmartEVSE-7777",
+    "username": "",
+    "password_set": false,
+    "status": "Disconnected"
+  },
+  "ocpp": {
+    "mode": "Disabled",
+    "backend_url": "",
+    "cb_id": "",
+    "auth_key": "",
+    "auto_auth": "Disabled",
+    "auto_auth_idtag": "",
+    "status": "Disconnected"
+  },
+  "home_battery": {
+    "current": 0,
+    "last_update": 0
+  },
+  "ev_meter": {
+    "description": "Disabled",
+    "address": 12,
+    "import_active_power": 0,
+    "total_kwh": 0,
+    "charged_kwh": 0,
+    "currents": {
+      "TOTAL": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+    },
+    "import_active_energy": 0,
+    "export_active_energy": 0
+  },
+  "mains_meter": {
+    "import_active_energy": 0,
+    "export_active_energy": 0,
+    "host": "p1meter-08EC0E.local"
+  },
+  "phase_currents": {
+    "TOTAL": 0,
+    "L1": -10,
+    "L2": 20,
+    "L3": -10,
+    "last_data_update": 1755447991,
+    "original_data": {
+      "TOTAL": 0,
+      "L1": -10,
+      "L2": 20,
+      "L3": -10
+    }
+  },
+  "backlight": {
+    "timer": 120,
+    "status": "ON"
+  },
+  "color": {
+    "off": {
+      "R": 0,
+      "G": 0,
+      "B": 0
+    },
+    "normal": {
+      "R": 0,
+      "G": 255,
+      "B": 0
+    },
+    "smart": {
+      "R": 0,
+      "G": 255,
+      "B": 0
+    },
+    "solar": {
+      "R": 255,
+      "G": 170,
+      "B": 0
+    },
+    "custom": {
+      "R": 0,
+      "G": 0,
+      "B": 255
+    }
+  }
+}
