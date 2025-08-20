@@ -1,5 +1,3 @@
-// noinspection ExceptionCaughtLocallyJS,JSIgnoredPromiseFromCall
-
 import {DestroyRef, inject, Injectable, signal} from '@angular/core';
 import {firstValueFrom} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
@@ -11,23 +9,22 @@ const API_BASE_URL = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&
 export class BitcoinStore {
 
   // State signals.
-  private _priceEur = signal<number>(0);
-  private _priceUsd = signal<number>(0);
-  private _lastUpdatedPriceEur = signal<number>(0);
-  private _lastUpdatedPriceUsd = signal<number>(0);
-  private _loadingPriceEur = signal<boolean>(false);
-  private _loadingPriceUsd = signal<boolean>(false);
-  private _errorPriceEur = signal<string | undefined>(undefined);
-  private _errorPriceUsd = signal<string | undefined>(undefined);
-
+  private readonly _priceEur = signal<number>(0);
   // Public readonly signals
   public readonly priceEur = this._priceEur.asReadonly();
+  private readonly _priceUsd = signal<number>(0);
   public readonly priceUsd = this._priceUsd.asReadonly();
+  private readonly _lastUpdatedPriceEur = signal<number>(0);
   public readonly lastUpdatedPriceEur = this._lastUpdatedPriceEur.asReadonly();
+  private readonly _lastUpdatedPriceUsd = signal<number>(0);
   public readonly lastUpdatedPriceUsd = this._lastUpdatedPriceUsd.asReadonly();
+  private readonly _loadingPriceEur = signal<boolean>(false);
   public readonly loadingPriceEur = this._loadingPriceEur.asReadonly();
+  private readonly _loadingPriceUsd = signal<boolean>(false);
   public readonly loadingPriceUsd = this._loadingPriceUsd.asReadonly();
+  private readonly _errorPriceEur = signal<string | undefined>(undefined);
   public readonly errorPriceEur = this._errorPriceEur.asReadonly();
+  private readonly _errorPriceUsd = signal<string | undefined>(undefined);
   public readonly errorPriceUsd = this._errorPriceUsd.asReadonly();
 
   private destroyRef = inject(DestroyRef);
@@ -36,11 +33,11 @@ export class BitcoinStore {
 
   constructor() {
     // Initial fetch and start polling each minute for both currencies.
-    this.loadEur();
-    this.loadUsd();
+    void this.loadEur();
+    void this.loadUsd();
     const id = setInterval(() => {
-      this.loadEur();
-      this.loadUsd();
+      void this.loadEur();
+      void this.loadUsd();
     }, 60_000);
 
     // Cleanup interval on component destroy.
@@ -59,12 +56,14 @@ export class BitcoinStore {
     try {
       const data = await firstValueFrom(this.http.get<any>(url))
       if (!data) {
-        throw Error('Empty response from price API');
+        this._errorPriceEur.set('Empty response from price API');
+        return;
       }
       // Expecting shape: { bitcoin: { eur|usd: number } }
       const value = data?.bitcoin?.eur;
       if (typeof value !== 'number') {
-        throw Error('Invalid response from price API');
+        this._errorPriceEur.set('Invalid response from price API');
+        return;
       }
       this._priceEur.set(value);
       this._lastUpdatedPriceEur.set(Date.now());
@@ -89,12 +88,14 @@ export class BitcoinStore {
     try {
       const data = await firstValueFrom(this.http.get<any>(url))
       if (!data) {
-        throw Error('Empty response from price API');
+        this._errorPriceUsd.set('Empty response from price API');
+        return;
       }
       // Expecting shape: { bitcoin: { eur|usd: number } }
       const value = data?.bitcoin?.usd;
       if (typeof value !== 'number') {
-        throw Error('Invalid response from price API');
+        this._errorPriceEur.set('Invalid response from price API');
+        return;
       }
       this._priceUsd.set(value);
       this._lastUpdatedPriceUsd.set(Date.now());

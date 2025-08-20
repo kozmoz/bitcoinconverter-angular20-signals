@@ -11,10 +11,10 @@ import {BitcoinStore} from './stores/bitcoin.store';
 export class App {
 
   // The amount will be null in case of empty or invalid input.
-  amount = signal<number | null>(1);
-  currency = signal<'eur' | 'usd'>('eur');
-  direction = signal<'btc-to-fiat' | 'fiat-to-btc'>('btc-to-fiat');
+  readonly amount = signal<number | null>(1);
+  readonly currency = signal<'eur' | 'usd'>('eur');
+  readonly direction = signal<'btc-to-fiat' | 'fiat-to-btc'>('btc-to-fiat');
 
   // Make the public BitcoinStore signals available to the template.
-  bitcoinStore = inject(BitcoinStore);
+  readonly bitcoinStore = inject(BitcoinStore);
 }
