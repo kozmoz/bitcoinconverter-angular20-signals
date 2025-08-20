@@ -10,7 +10,8 @@ import {BitcoinStore} from './stores/bitcoin.store';
 })
 export class App {
 
-  amount = signal(1);
+  // The amount will be null in case of empty or invalid input.
+  amount = signal<number | null>(1);
   currency = signal<'eur' | 'usd'>('eur');
   direction = signal<'btc-to-fiat' | 'fiat-to-btc'>('btc-to-fiat');
 

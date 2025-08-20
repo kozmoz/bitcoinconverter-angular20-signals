@@ -5,6 +5,8 @@ import {firstValueFrom} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {NetworkService} from '../services/network.service';
 
+const API_BASE_URL = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=`;
+
 @Injectable({providedIn: 'root'})
 export class BitcoinStore {
 
@@ -41,11 +43,11 @@ export class BitcoinStore {
    * @return A promise that resolves when the operation is complete.
    */
   async loadEur(): Promise<void> {
-    const URL = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur`;
+    const url = `${API_BASE_URL}eur`;
     this.loadingPriceEur.set(true);
     this.errorPriceEur.set(undefined);
     try {
-      const data = await firstValueFrom(this.http.get<any>(URL))
+      const data = await firstValueFrom(this.http.get<any>(url))
       if (!data) {
         throw Error('Empty response from price API');
       }
@@ -56,12 +58,12 @@ export class BitcoinStore {
       }
       this.priceEur.set(value);
       this.lastUpdatedPriceEur.set(Date.now());
-      this.loadingPriceEur.set(false);
       this.errorPriceEur.set(undefined);
 
     } catch (error) {
-      this.loadingPriceEur.set(false);
       this.errorPriceEur.set(this.networkService.toErrorMessage(error) ?? 'Failed to fetch EUR price');
+    } finally {
+      this.loadingPriceEur.set(false);
     }
   }
 
@@ -71,11 +73,11 @@ export class BitcoinStore {
    * @return A promise that resolves when the operation is complete.
    */
   async loadUsd(): Promise<void> {
-    const URL = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`;
+    const url = `${API_BASE_URL}usd`;
     this.loadingPriceUsd.set(true);
     this.errorPriceUsd.set(undefined);
     try {
-      const data = await firstValueFrom(this.http.get<any>(URL))
+      const data = await firstValueFrom(this.http.get<any>(url))
       if (!data) {
         throw Error('Empty response from price API');
       }
@@ -86,12 +88,12 @@ export class BitcoinStore {
       }
       this.priceUsd.set(value);
       this.lastUpdatedPriceUsd.set(Date.now());
-      this.loadingPriceUsd.set(false);
       this.errorPriceUsd.set(undefined);
 
     } catch (error) {
-      this.loadingPriceUsd.set(false);
       this.errorPriceUsd.set(this.networkService.toErrorMessage(error) ?? 'Failed to fetch USD price');
+    } finally {
+      this.loadingPriceUsd.set(false);
     }
   }
 }

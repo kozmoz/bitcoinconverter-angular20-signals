@@ -55,7 +55,7 @@
                    [attr.step]="direction() === 'btc-to-fiat' ? '0.000001' : '1'" min="0" [(ngModel)]="amount"
                    [disabled]="priceEur() === null || priceUsd() === null"/>
           </div>
-          <div class="form-text">The amount that is user for the calculations.</div>
+          <div class="form-text">The amount that is used for the calculations.</div>
         </div>
       </div>
     </div>
@@ -75,22 +75,22 @@
 
             @if (direction() === 'fiat-to-btc') {
               @if (currency() === 'eur') {
-                {{ amount() || 0 | currency:'EUR':'symbol':'1.2-2' }}
-                ≈ <strong>{{ amount() || 0 / eur | number:'1.8-8' }}&nbsp;BTC</strong>
+                {{ amount() ?? 0 | currency:'EUR':'symbol':'1.2-2' }}
+                ≈ <strong>{{ (amount() ?? 0) / eur | number:'1.8-8' }}&nbsp;BTC</strong>
               }
               @if (currency() === 'usd') {
-                {{ amount() || 0 | currency:'USD':'symbol':'1.2-2' }}
-                ≈ <strong>{{ amount() || 0 / usd | number:'1.8-8' }}&nbsp;BTC</strong>
+                {{ amount() ?? 0 | currency:'USD':'symbol':'1.2-2' }}
+                ≈ <strong>{{ (amount() ?? 0) / usd | number:'1.8-8' }}&nbsp;BTC</strong>
               }
             }
 
             @if (direction() === 'btc-to-fiat') {
-              {{ amount() || 0 | number:'1.8-8' }}&nbsp;BTC
+              {{ amount() ?? 0 | number:'1.8-8' }}&nbsp;BTC
               @if (currency() === 'eur') {
-                ≈ <strong>{{ (amount() || 0) * eur | currency:'EUR':'symbol':'1.2-2' }}</strong>
+                ≈ <strong>{{ (amount() ?? 0) * eur | currency:'EUR':'symbol':'1.2-2' }}</strong>
               }
               @if (currency() === 'usd') {
-                ≈ <strong>{{ (amount() || 0) * usd | currency:'USD':'symbol':'1.2-2' }}</strong>
+                ≈ <strong>{{ (amount() ?? 0) * usd | currency:'USD':'symbol':'1.2-2' }}</strong>
               }
             }
 
