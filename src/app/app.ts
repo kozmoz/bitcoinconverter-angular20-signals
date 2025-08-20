@@ -15,18 +15,6 @@ export class App {
   currency = signal<'eur' | 'usd'>('eur');
   direction = signal<'btc-to-fiat' | 'fiat-to-btc'>('btc-to-fiat');
 
-  private bitcoinStore = inject(BitcoinStore);
-
-  priceEur = this.bitcoinStore.priceEur;
-  priceUsd = this.bitcoinStore.priceUsd;
-
-  lastUpdatedEur = this.bitcoinStore.lastUpdatedPriceEur;
-  lastUpdatedUsd = this.bitcoinStore.lastUpdatedPriceUsd;
-
-  loadingPriceEur = this.bitcoinStore.loadingPriceEur;
-  loadingPriceUsd = this.bitcoinStore.loadingPriceUsd;
-
-  errorEur = this.bitcoinStore.errorPriceEur;
-  errorUsd = this.bitcoinStore.errorPriceUsd;
-
+  // Make the public BitcoinStore signals available to the template.
+  bitcoinStore = inject(BitcoinStore);
 }

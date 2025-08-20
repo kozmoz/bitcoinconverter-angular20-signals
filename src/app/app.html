@@ -15,7 +15,7 @@
         <label class="col-sm-2 col-form-label" for="currency">Currency</label>
         <div class="col-sm-10">
           <select id="currency" class="form-select w-auto" [(ngModel)]="currency"
-                  [disabled]="priceEur() === null || priceUsd() === null">
+                  [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
             <option value="eur">EUR</option>
             <option value="usd">USD</option>
           </select>
@@ -28,7 +28,7 @@
           <div class="form-check form-check">
             <input class="form-check-input" type="radio" id="dir-btc-to-fiat" name="direction"
                    [value]="'btc-to-fiat'" [(ngModel)]="direction"
-                   [disabled]="priceEur() === null || priceUsd() === null">
+                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
             <label class="form-check-label" for="dir-btc-to-fiat">
               BTC → {{ currency() === 'eur' ? 'Euro' : 'Dollar' }}
             </label>
@@ -36,7 +36,7 @@
           <div class="form-check form-check">
             <input class="form-check-input" type="radio" id="dir-fiat-to-btc" name="direction"
                    [value]="'fiat-to-btc'" [(ngModel)]="direction"
-                   [disabled]="priceEur() === null || priceUsd() === null">
+                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
             <label class="form-check-label" for="dir-fiat-to-btc">
               {{ currency() === 'eur' ? 'Euro' : 'Dollar' }} → BTC
             </label>
@@ -53,7 +53,7 @@
             </span>
             <input id="amount" class="form-control" type="number"
                    [attr.step]="direction() === 'btc-to-fiat' ? '0.000001' : '1'" min="0" [(ngModel)]="amount"
-                   [disabled]="priceEur() === null || priceUsd() === null"/>
+                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null"/>
           </div>
           <div class="form-text">The amount that is used for the calculations.</div>
         </div>
@@ -63,8 +63,8 @@
     <!-- Right: Rate Panel -->
     <div class="col-12 col-lg-6">
 
-      @let eur = priceEur();
-      @let usd = priceUsd();
+      @let eur = bitcoinStore.priceEur();
+      @let usd = bitcoinStore.priceUsd();
 
       <div class="border border-2 border-primary rounded-4 p-4">
         <div class="display-6 fw-semibold text-center mb-3">
@@ -100,7 +100,7 @@
 
         <div class="text-center text-muted" style="position: relative;">
 
-          @if (loadingPriceEur() || loadingPriceUsd()) {
+          @if (bitcoinStore.loadingPriceEur() || bitcoinStore.loadingPriceUsd()) {
             <div class="text-center" style="position: absolute; right: 0; top: 0;">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -108,8 +108,13 @@
             </div>
           }
 
-          Last EUR update at: <strong>{{ lastUpdatedEur() ? (lastUpdatedEur() | date:'HH:mm') : '-' }}</strong><br/>
-          Last USD update at: <strong>{{ lastUpdatedUsd() ? (lastUpdatedUsd() | date:'HH:mm') : '-' }}</strong><br/>
+          @let lastUpdatedPriceEur = bitcoinStore.lastUpdatedPriceEur();
+          @let lastUpdatedPriceUsd = bitcoinStore.lastUpdatedPriceUsd();
+
+          Last EUR update at:
+          <strong>{{ lastUpdatedPriceEur ? (lastUpdatedPriceUsd | date:'HH:mm') : '-' }}</strong><br/>
+          Last USD update at:
+          <strong>{{ lastUpdatedPriceUsd ? (lastUpdatedPriceUsd | date:'HH:mm') : '-' }}</strong><br/>
 
           @if (eur > 0) {
             1 BTC = {{ eur | currency:'EUR':'symbol':'1.2-2' }}
@@ -123,11 +128,11 @@
   </div>
 
   <div class="mt-4">
-    @if (errorEur()) {
-      <div class="alert alert-danger" role="alert">{{ errorEur() }}</div>
+    @if (bitcoinStore.errorPriceEur()) {
+      <div class="alert alert-danger" role="alert">{{ bitcoinStore.errorPriceEur() }}</div>
     }
-    @if (errorUsd()) {
-      <div class="alert alert-danger" role="alert">{{ errorUsd() }}</div>
+    @if (bitcoinStore.errorPriceUsd()) {
+      <div class="alert alert-danger" role="alert">{{ bitcoinStore.errorPriceUsd() }}</div>
     }
   </div>
 </div>
