@@ -1,11 +1,13 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {DestroyRef, inject, Injectable, signal} from '@angular/core';
 import {firstValueFrom} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {NetworkService} from '../services/network.service';
 
-const API_BASE_URL = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=`;
+const API_BASE_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur,usd';
 
 type Price = { eur: number, usd: number, last_updated: number };
+
+type ApiResponse = { bitcoin?: { eur?: number; usd?: number } };
 
 @Injectable({providedIn: 'root'})
 export class BitcoinStore {
@@ -22,13 +24,21 @@ export class BitcoinStore {
 
   private http: HttpClient = inject(HttpClient);
   private networkService: NetworkService = inject(NetworkService);
+  private destroyRef = inject(DestroyRef);
 
   constructor() {
     // Initial fetch and start polling each minute for both currencies.
     void this.loadPrice();
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       void this.loadPrice();
     }, 60_000);
+
+    // Cleanup on destroy.
+    this.destroyRef.onDestroy(() => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    });
   }
 
   /**
@@ -41,22 +51,20 @@ export class BitcoinStore {
     this._error.set(null);
     try {
       // Fetch both currencies in parallel.
-      const [dataEur, dataUsd] = await Promise.all([
-        firstValueFrom(this.http.get<any>(`${API_BASE_URL}eur`)),
-        firstValueFrom(this.http.get<any>(`${API_BASE_URL}usd`))
-      ]);
-      if (!dataEur || !dataUsd) {
+      const data = await firstValueFrom(this.http.get<ApiResponse>(API_BASE_URL));
+      if (!data) {
         this._error.set('Empty response from price API');
         return;
       }
-      // Expecting shape: { bitcoin: { eur|usd: number } }
-      const valueEur = dataEur?.bitcoin?.eur;
-      const valueUsd = dataEur?.bitcoin?.usd;
-      if (typeof valueEur !== 'number' || typeof valueUsd !== 'number') {
+
+      // Expecting shape: { bitcoin: { eur: number, usd: number } }
+      const {eur, usd} = data.bitcoin ?? {};
+      if (typeof eur !== 'number' || typeof usd !== 'number') {
         this._error.set('Invalid response from price API');
         return;
       }
-      this._price.set({eur: valueEur, usd: valueUsd, last_updated: Date.now()});
+      const last_updated = Date.now();
+      this._price.set({eur, usd, last_updated});
       this._error.set(null);
 
     } catch (error) {
