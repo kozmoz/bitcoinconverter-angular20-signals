@@ -6,6 +6,8 @@
   </div>
 </div>
 
+@let price = bitcoinStore.price();
+
 <div class="container mb-5">
   <div class="row g-4 align-items-start">
     <!-- Left: Form -->
@@ -14,8 +16,7 @@
       <div class="mb-3 row">
         <label class="col-sm-2 col-form-label" for="currency">Currency</label>
         <div class="col-sm-10">
-          <select id="currency" class="form-select w-auto" [(ngModel)]="currency"
-                  [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
+          <select id="currency" class="form-select w-auto" [(ngModel)]="currency" [disabled]="!price">
             <option value="eur">EUR</option>
             <option value="usd">USD</option>
           </select>
@@ -27,16 +28,14 @@
         <div class="col-sm-10">
           <div class="form-check form-check">
             <input class="form-check-input" type="radio" id="dir-btc-to-fiat" name="direction"
-                   [value]="'btc-to-fiat'" [(ngModel)]="direction"
-                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
+                   [value]="'btc-to-fiat'" [(ngModel)]="direction" [disabled]="!price">
             <label class="form-check-label" for="dir-btc-to-fiat">
               BTC → {{ currency() === 'eur' ? 'Euro' : 'Dollar' }}
             </label>
           </div>
           <div class="form-check form-check">
             <input class="form-check-input" type="radio" id="dir-fiat-to-btc" name="direction"
-                   [value]="'fiat-to-btc'" [(ngModel)]="direction"
-                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null">
+                   [value]="'fiat-to-btc'" [(ngModel)]="direction" [disabled]="!price">
             <label class="form-check-label" for="dir-fiat-to-btc">
               {{ currency() === 'eur' ? 'Euro' : 'Dollar' }} → BTC
             </label>
@@ -52,8 +51,9 @@
               {{ (direction() === 'btc-to-fiat') ? 'BTC' : (currency() === 'eur' ? 'EUR' : 'USD') }}
             </span>
             <input id="amount" class="form-control" type="number"
-                   [attr.step]="direction() === 'btc-to-fiat' ? '0.000001' : '1'" min="0" [(ngModel)]="amount"
-                   [disabled]="bitcoinStore.priceEur() === null || bitcoinStore.priceUsd() === null"/>
+                   [attr.step]="direction() === 'btc-to-fiat' ? '0.000001' : '1'" min="0"
+                   [(ngModel)]="amount"
+                   [disabled]="!price"/>
           </div>
           <div class="form-text">The amount that is used for the calculations.</div>
         </div>
@@ -63,34 +63,32 @@
     <!-- Right: Rate Panel -->
     <div class="col-12 col-lg-6">
 
-      @let eur = bitcoinStore.priceEur();
-      @let usd = bitcoinStore.priceUsd();
-
       <div class="border border-2 border-primary rounded-4 p-4">
         <div class="display-6 fw-semibold text-center mb-3">
 
-          @if (eur === 0 || usd === 0) {
-            <div class="text-muted">Loading current rate…</div>
-          } @else {
+          @if (!price && bitcoinStore.loading()) {
+            <div class="text-muted">First call loading current rate…</div>
+          }
 
+          @if (price) {
             @if (direction() === 'fiat-to-btc') {
               @if (currency() === 'eur') {
                 {{ amount() ?? 0 | currency:'EUR':'symbol':'1.2-2' }}
-                ≈ <strong>{{ (amount() ?? 0) / eur | number:'1.8-8' }}&nbsp;BTC</strong>
+                ≈ <strong>{{ (amount() ?? 0) / price.eur | number:'1.8-8' }}&nbsp;BTC</strong>
               }
               @if (currency() === 'usd') {
                 {{ amount() ?? 0 | currency:'USD':'symbol':'1.2-2' }}
-                ≈ <strong>{{ (amount() ?? 0) / usd | number:'1.8-8' }}&nbsp;BTC</strong>
+                ≈ <strong>{{ (amount() ?? 0) / price.usd | number:'1.8-8' }}&nbsp;BTC</strong>
               }
             }
 
             @if (direction() === 'btc-to-fiat') {
               {{ amount() ?? 0 | number:'1.8-8' }}&nbsp;BTC
               @if (currency() === 'eur') {
-                ≈ <strong>{{ (amount() ?? 0) * eur | currency:'EUR':'symbol':'1.2-2' }}</strong>
+                ≈ <strong>{{ (amount() ?? 0) * price.eur | currency:'EUR':'symbol':'1.2-2' }}</strong>
               }
               @if (currency() === 'usd') {
-                ≈ <strong>{{ (amount() ?? 0) * usd | currency:'USD':'symbol':'1.2-2' }}</strong>
+                ≈ <strong>{{ (amount() ?? 0) * price.usd | currency:'USD':'symbol':'1.2-2' }}</strong>
               }
             }
 
@@ -100,7 +98,7 @@
 
         <div class="text-center text-muted" style="position: relative;">
 
-          @if (bitcoinStore.loadingPriceEur() || bitcoinStore.loadingPriceUsd()) {
+          @if (bitcoinStore.loading()) {
             <div class="text-center" style="position: absolute; right: 0; top: 0;">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -108,19 +106,15 @@
             </div>
           }
 
-          @let lastUpdatedPriceEur = bitcoinStore.lastUpdatedPriceEur();
-          @let lastUpdatedPriceUsd = bitcoinStore.lastUpdatedPriceUsd();
+          @let lastUpdatedPrice = price?.last_updated;
+          Last update at:
+          <strong>{{ lastUpdatedPrice ? (lastUpdatedPrice | date:'HH:mm') : '-' }}</strong><br/>
 
-          Last EUR update at:
-          <strong>{{ lastUpdatedPriceEur ? (lastUpdatedPriceUsd | date:'HH:mm') : '-' }}</strong><br/>
-          Last USD update at:
-          <strong>{{ lastUpdatedPriceUsd ? (lastUpdatedPriceUsd | date:'HH:mm') : '-' }}</strong><br/>
-
-          @if (eur > 0) {
-            1 BTC = {{ eur | currency:'EUR':'symbol':'1.2-2' }}
+          @if (price?.eur) {
+            1 BTC = {{ price?.eur | currency:'EUR':'symbol':'1.2-2' }}
           }<br/>
-          @if (usd > 0) {
-            1 BTC = {{ usd | currency:'USD':'symbol':'1.2-2' }}
+          @if (price?.usd) {
+            1 BTC = {{ price?.usd | currency:'USD':'symbol':'1.2-2' }}
           }
         </div>
       </div>
@@ -128,11 +122,8 @@
   </div>
 
   <div class="mt-4">
-    @if (bitcoinStore.errorPriceEur()) {
-      <div class="alert alert-danger" role="alert">{{ bitcoinStore.errorPriceEur() }}</div>
-    }
-    @if (bitcoinStore.errorPriceUsd()) {
-      <div class="alert alert-danger" role="alert">{{ bitcoinStore.errorPriceUsd() }}</div>
+    @if (bitcoinStore.error()) {
+      <div class="alert alert-danger" role="alert">{{ bitcoinStore.error() }}</div>
     }
   </div>
 </div>

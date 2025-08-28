@@ -27,5 +27,4 @@ export class NetworkService {
     return String(error);
   }
 
-
 }
